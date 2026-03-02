@@ -191,6 +191,18 @@ async function sincronizarSheets() {
 
         // Carga inicial
         window.onload = sincronizarSheets;
+
+        // Crear los sonidos
+const sonidoOk = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+const sonidoError = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
+
+// En tu función validarSocio(), añade esto:
+if (socio.pago.includes("AL DIA")) {
+    sonidoOk.play(); // Suena un "Ding"
+    abrirPuerta();
+} else {
+    sonidoError.play(); // Suena un "Error"
+}
     </script>
 </body>
 </html>
