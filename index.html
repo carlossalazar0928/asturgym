@@ -100,11 +100,17 @@
         }
 
         // 2. Acción Sonoff
-        function abrirPuerta() {
-            console.log(`Abriendo Sonoff ${SONOFF_ID}...`);
-            // NOTA: Para PC local, si el Sonoff tiene IP fija, se puede usar un fetch local.
-            // Por ahora simulamos la señal.
-        }
+function abrirPuerta() {
+    console.log("Abriendo puerta vía IP Local...");
+    // Esto funciona si el Sonoff tiene el modo LAN activado
+    fetch('http://192.168.0.228:8081/zeroconf/switch', {
+        method: 'POST',
+        body: JSON.stringify({
+            deviceid: "10023d09c2",
+            data: { switch: "on" }
+        })
+    });
+}
 
         // 3. Funciones Admin
         function showAdminLogin() { document.getElementById('modal-admin').classList.remove('hidden'); }
