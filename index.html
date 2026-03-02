@@ -7,177 +7,166 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root { --astur-blue: #0066bc; --astur-yellow: #f9d71c; }
-        body { background-color: var(--astur-blue); font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        body { background-color: var(--astur-blue); font-family: 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; }
         .astur-gradient { background: linear-gradient(135deg, var(--astur-blue) 0%, #004a87 100%); }
-        .access-card { transition: all 0.5s ease-in-out; }
-        .status-success { background-color: #22c55e; border-color: #16a34a; }
-        .status-error { background-color: #ef4444; border-color: #dc2626; }
+        .access-card { transition: all 0.3s ease-in-out; border-radius: 1.5rem; overflow: hidden; }
+        .status-success { border-color: #22c55e; background-color: rgba(34, 197, 94, 0.1); }
+        .status-error { border-color: #ef4444; background-color: rgba(239, 68, 68, 0.1); }
+        /* Scrollbar personalizada para la lista */
+        #access-log::-webkit-scrollbar { width: 6px; }
+        #access-log::-webkit-scrollbar-thumb { background: var(--astur-yellow); border-radius: 10px; }
     </style>
 </head>
-<body class="astur-gradient flex items-center justify-center min-h-screen">
+<body class="astur-gradient flex items-center justify-center p-6">
 
-    <div id="view-client" class="text-center w-full max-w-4xl px-4">
-        <img src="https://i.ibb.co/svknfxSq/541227282-18045312167644134-5085573338939708126-n.jpg" alt="Astur Gym Logo" class="w-48 mx-auto mb-6 drop-shadow-lg">
-        <h1 class="text-5xl font-black text-astur-yellow mb-8 tracking-tighter italic">ASTUR GYM</h1>
+    <div class="flex w-full max-w-7xl gap-6 h-[85vh]">
         
-        <div class="bg-white/10 backdrop-blur-md p-10 rounded-3xl shadow-2xl border border-white/20">
-            <p class="text-white text-xl mb-4">IDENTIFÍQUESE (DNI / QR / Nº SOCIO)</p>
-            <input type="text" id="main-input" autofocus 
-                class="w-full bg-white text-astur-blue text-5xl font-bold text-center py-6 rounded-2xl border-4 border-astur-yellow focus:outline-none shadow-inner"
-                placeholder="00000000" onkeyup="handleInput(event)">
+        <div id="view-client" class="flex-1 text-center flex flex-col justify-center">
+            <img src="https://i.ibb.co/svknfxSq/541227282-18045312167644134-5085573338939708126-n.jpg" alt="Astur Gym Logo" class="w-40 mx-auto mb-4 drop-shadow-lg">
+            <h1 class="text-5xl font-black text-astur-yellow mb-6 tracking-tighter italic uppercase">ASTUR GYM</h1>
             
-            <div id="display-result" class="hidden mt-8 p-8 rounded-2xl access-card border-4 animate-bounce">
-                <div class="flex items-center justify-around">
-                    <img id="res-foto" src="" class="w-48 h-48 rounded-2xl object-cover border-4 border-white shadow-xl">
-                    <div class="text-left text-white">
-                        <h2 id="res-nombre" class="text-4xl font-black uppercase"></h2>
-                        <p id="res-dni" class="text-xl opacity-80"></p>
-                        <p id="res-status-text" class="text-3xl font-bold mt-2"></p>
+            <div class="bg-white/10 backdrop-blur-md p-8 rounded-3xl shadow-2xl border border-white/20">
+                <p class="text-white text-xl mb-4 font-bold uppercase tracking-widest">Ingrese DNI o Socio</p>
+                <input type="text" id="main-input" autofocus 
+                    class="w-full bg-white text-astur-blue text-5xl font-bold text-center py-5 rounded-2xl border-4 border-astur-yellow focus:outline-none shadow-inner"
+                    placeholder="00000000" onkeyup="handleInput(event)">
+                
+                <div id="display-result" class="hidden mt-6 p-6 bg-white border-8 access-card relative shadow-2xl animate-pulse">
+                    <img src="https://i.ibb.co/svknfxSq/541227282-18045312167644134-5085573338939708126-n.jpg" class="absolute top-2 right-2 w-10 opacity-50">
+                    
+                    <div class="flex items-center gap-6">
+                        <img id="res-foto" src="https://www.w3schools.com/howto/img_avatar.png" class="w-40 h-40 rounded-xl object-cover border-4 border-astur-blue shadow-md">
+                        <div class="text-left">
+                            <h2 id="res-nombre" class="text-3xl font-black uppercase text-gray-800 leading-tight"></h2>
+                            <p id="res-dni" class="text-lg font-bold text-gray-500 mb-2"></p>
+                            <p id="res-status-text" class="text-2xl font-black px-4 py-1 rounded-lg inline-block text-white"></p>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <button onclick="showAdminLogin()" class="mt-6 text-white/40 hover:text-astur-yellow transition font-bold text-sm tracking-widest uppercase">Panel de Administración</button>
         </div>
 
-        <button onclick="showAdminLogin()" class="mt-10 text-white/30 hover:text-astur-yellow transition font-bold">ACCESO ADM</button>
+        <div class="w-80 bg-black/30 backdrop-blur-md rounded-3xl border border-white/10 flex flex-col overflow-hidden">
+            <div class="bg-white/10 p-4 text-center border-b border-white/10">
+                <h3 class="text-astur-yellow font-black uppercase tracking-wider">Historial Reciente</h3>
+            </div>
+            <div id="access-log" class="flex-1 overflow-y-auto p-4 space-y-3">
+                </div>
+        </div>
     </div>
 
     <div id="modal-admin" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-50">
-        <div class="bg-white p-8 rounded-2xl w-full max-w-md">
-            <h2 class="text-2xl font-bold text-astur-blue mb-4">Panel de Administración</h2>
+        <div class="bg-white p-8 rounded-2xl w-full max-w-md shadow-2xl">
+            <h2 class="text-2xl font-bold text-astur-blue mb-4 uppercase tracking-tighter">Administración</h2>
             <div id="admin-auth">
-                <input type="password" id="admin-pass" class="w-full border-2 p-3 rounded mb-4" placeholder="Clave:">
-                <button onclick="loginAdmin()" class="w-full bg-astur-blue text-white py-3 rounded font-bold">ENTRAR</button>
+                <input type="password" id="admin-pass" class="w-full border-2 p-3 rounded-xl mb-4 text-center text-xl" placeholder="CLAVE: gym1081">
+                <button onclick="loginAdmin()" class="w-full bg-astur-blue text-white py-4 rounded-xl font-black uppercase tracking-widest hover:bg-blue-700 transition">ENTRAR</button>
+                <button onclick="cerrarAdmin()" class="w-full mt-2 text-gray-400 text-xs uppercase">Cancelar</button>
             </div>
             <div id="admin-controls" class="hidden space-y-4">
-                <button onclick="sincronizarSheets()" class="w-full bg-green-600 text-white p-3 rounded">🔄 Sincronizar Google Sheets</button>
+                <button onclick="sincronizarSheets()" class="w-full bg-green-600 text-white p-4 rounded-xl font-bold hover:bg-green-700 shadow-lg">🔄 Sincronizar Google Sheets</button>
                 <input type="file" id="foto-uploader" class="hidden" multiple onchange="procesarFotos(event)">
-                <button onclick="document.getElementById('foto-uploader').click()" class="w-full bg-blue-600 text-white p-3 rounded">📸 Importar Fotos (DNI.jpg)</button>
-                <button onclick="cerrarAdmin()" class="w-full bg-gray-200 p-3 rounded text-gray-700">Cerrar</button>
+                <button onclick="document.getElementById('foto-uploader').click()" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold hover:bg-blue-700 shadow-lg">📸 Importar Fotos (DNI.jpg)</button>
+                <button onclick="cerrarAdmin()" class="w-full bg-gray-200 p-3 rounded-xl text-gray-700 font-bold uppercase">Salir del Panel</button>
             </div>
         </div>
     </div>
 
     <script>
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTCyEdIV_bC82uoGFq1mIvJOXrvJI19KzwLVGjxyH8jYefbnHkNorxelpwTTqJ8KczrzoiiZ24dBWFj/pub?output=csv";
+        const SONOFF_IP = "192.168.0.228";
         const SONOFF_ID = "10023d09c2";
+        
         let sociosDB = [];
         let fotosDB = {};
+        const sonidoOk = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+        const sonidoError = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
 
-        // 1. Manejo de Entrada (DNI o QR)
         function handleInput(e) {
             if (e.key === "Enter") {
-                validarSocio(e.target.value);
-                e.target.value = ""; // Limpiar para el siguiente
+                validarSocio(e.target.value.trim());
+                e.target.value = "";
             }
         }
 
         async function validarSocio(id) {
             const socio = sociosDB.find(s => s.dni == id || s.numeroSocio == id);
             const display = document.getElementById('display-result');
+            const statusText = document.getElementById('res-status-text');
             
             if (!socio) {
                 alert("Socio no registrado");
                 return;
             }
 
-            // Mostrar Datos
+            // Datos en tarjeta
             display.classList.remove('hidden', 'status-success', 'status-error');
             document.getElementById('res-nombre').innerText = socio.nombre;
-            document.getElementById('res-dni').innerText = "DNI: " + socio.dni;
-            document.getElementById('res-foto').src = fotosDB[socio.dni] || 'document.getElementById('res-foto').src = fotosDB[socio.dni] || 'https://www.w3schools.com/howto/img_avatar.png';';
+            document.getElementById('res-dni').innerText = "SOCIO: " + socio.numeroSocio + " | DNI: " + socio.dni;
+            document.getElementById('res-foto').src = fotosDB[socio.dni] || 'https://www.w3schools.com/howto/img_avatar.png';
 
-            if (socio.pago.includes("AL DIA") || socio.pago.includes("ACTIVO")) {
+            const esValido = socio.pago.includes("AL DIA") || socio.pago.includes("ACTIVO");
+
+            if (esValido) {
                 display.classList.add('status-success');
-                document.getElementById('res-status-text').innerText = "✅ ACCESO PERMITIDO";
+                statusText.innerText = "ACCESO AUTORIZADO";
+                statusText.style.backgroundColor = "#22c55e";
+                sonidoOk.play();
                 abrirPuerta();
             } else {
                 display.classList.add('status-error');
-                document.getElementById('res-status-text').innerText = "❌ ACCESO DENEGADO";
+                statusText.innerText = "ACCESO DENEGADO";
+                statusText.style.backgroundColor = "#ef4444";
+                sonidoError.play();
             }
 
-            // Ocultar mensaje después de 4 segundos
-            setTimeout(() => display.classList.add('hidden'), 4000);
+            agregarAlLog(socio, esValido);
+
+            setTimeout(() => display.classList.add('hidden'), 5000);
         }
 
-        // 2. Acción Sonoff
-async function abrirPuerta() {
-    const SONOFF_IP = "192.168.0.228";
-    const DEVICE_ID = "10023d09c2";
-    
-    // El Sonoff Mini es muy estricto con este formato
-    const dataOn = {
-        "deviceid": DEVICE_ID,
-        "data": { "switch": "on" }
-    };
-
-    const dataOff = {
-        "deviceid": DEVICE_ID,
-        "data": { "switch": "off" }
-    };
-
-    console.log("🚀 Enviando pulso de apertura...");
-
-    try {
-        // Usamos una técnica llamada 'keepalive' para asegurar que llegue
-        await fetch(`http://${SONOFF_IP}:8081/zeroconf/switch`, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify(dataOn)
-        });
-
-        console.log("✅ ON enviado");
-
-        // El perno necesita unos segundos para que la persona pase
-        setTimeout(async () => {
-            await fetch(`http://${SONOFF_IP}:8081/zeroconf/switch`, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify(dataOff)
-            });
-            console.log("🔒 OFF enviado (Perno cerrado)");
-        }, 3000);
-
-    } catch (error) {
-        console.error("Error de red local:", error);
-    }
-}
-        // 3. Funciones Admin
-        function showAdminLogin() { document.getElementById('modal-admin').classList.remove('hidden'); }
-        function cerrarAdmin() { document.getElementById('modal-admin').classList.add('hidden'); }
-        
-        function loginAdmin() {
-            if(document.getElementById('admin-pass').value === "gym1081") {
-                document.getElementById('admin-auth').classList.add('hidden');
-                document.getElementById('admin-controls').classList.remove('hidden');
-            }
+        function agregarAlLog(socio, exito) {
+            const log = document.getElementById('access-log');
+            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const entry = document.createElement('div');
+            entry.className = `p-3 rounded-xl border-l-4 bg-white/10 ${exito ? 'border-green-500' : 'border-red-500'} animate-fade-in`;
+            entry.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <span class="text-white font-bold text-sm truncate w-40">${socio.nombre}</span>
+                    <span class="text-white/50 text-[10px]">${time}</span>
+                </div>
+                <div class="text-[10px] ${exito ? 'text-green-400' : 'text-red-400'} font-black uppercase">
+                    ${exito ? 'Ingresó' : 'Denegado'}
+                </div>
+            `;
+            log.prepend(entry);
         }
 
-async function sincronizarSheets() {
-    try {
-        const res = await fetch(SHEET_URL + "&cachebuster=" + new Date().getTime()); // Evita que la PC guarde una versión vieja
-        const csv = await res.text();
-        
-        // Dividimos por líneas y limpiamos espacios o retornos de carro (\r)
-        const filas = csv.split(/\r?\n/).slice(1); 
-        
-        sociosDB = filas.map(f => {
-            const c = f.split(",");
-            // Limpiamos cada celda de espacios en blanco a los costados
-            return { 
-                nombre: c[0]?.trim() || "", 
-                dni: c[1]?.trim() || "", 
-                numeroSocio: c[2]?.trim() || "", 
-                pago: c[3]?.trim().toUpperCase() || "" 
-            };
-        }).filter(s => s.dni !== ""); // Ignoramos filas vacías
+        async function abrirPuerta() {
+            const dataOn = { "deviceid": SONOFF_ID, "data": { "switch": "on" } };
+            const dataOff = { "deviceid": SONOFF_ID, "data": { "switch": "off" } };
+            try {
+                await fetch(`http://${SONOFF_IP}:8081/zeroconf/switch`, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dataOn) });
+                setTimeout(async () => {
+                    await fetch(`http://${SONOFF_IP}:8081/zeroconf/switch`, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dataOff) });
+                }, 3000);
+            } catch (error) { console.error("Error Sonoff:", error); }
+        }
 
-        console.log("Base de datos cargada con éxito:", sociosDB);
-        alert(`Sincronizado: ${sociosDB.length} socios listos.`);
-    } catch (err) {
-        console.error("Error cargando el Excel:", err);
-        alert("No se pudo conectar con el Excel. Verifica internet.");
-    }
-}
+        async function sincronizarSheets() {
+            try {
+                const res = await fetch(SHEET_URL + "&t=" + Date.now());
+                const csv = await res.text();
+                const filas = csv.split(/\r?\n/).slice(1);
+                sociosDB = filas.map(f => {
+                    const c = f.split(",");
+                    return { nombre: c[0]?.trim(), dni: c[1]?.trim(), numeroSocio: c[2]?.trim(), pago: c[3]?.trim().toUpperCase() };
+                }).filter(s => s.dni);
+                alert("Base de datos actualizada: " + sociosDB.length + " socios.");
+            } catch (err) { alert("Error al cargar datos."); }
+        }
 
         function procesarFotos(e) {
             Array.from(e.target.files).forEach(file => {
@@ -186,23 +175,19 @@ async function sincronizarSheets() {
                 reader.onload = (ev) => fotosDB[dni] = ev.target.result;
                 reader.readAsDataURL(file);
             });
-            alert("Fotos vinculadas");
+            alert("Fotos vinculadas correctamente.");
         }
 
-        // Carga inicial
+        function showAdminLogin() { document.getElementById('modal-admin').classList.remove('hidden'); }
+        function cerrarAdmin() { document.getElementById('modal-admin').classList.add('hidden'); }
+        function loginAdmin() {
+            if(document.getElementById('admin-pass').value === "gym1081") {
+                document.getElementById('admin-auth').classList.add('hidden');
+                document.getElementById('admin-controls').classList.remove('hidden');
+            } else { alert("Clave incorrecta"); }
+        }
+
         window.onload = sincronizarSheets;
-
-        // Crear los sonidos
-const sonidoOk = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
-const sonidoError = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
-
-// En tu función validarSocio(), añade esto:
-if (socio.pago.includes("AL DIA")) {
-    sonidoOk.play(); // Suena un "Ding"
-    abrirPuerta();
-} else {
-    sonidoError.play(); // Suena un "Error"
-}
     </script>
 </body>
 </html>
