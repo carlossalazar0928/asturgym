@@ -104,38 +104,41 @@ async function abrirPuerta() {
     const SONOFF_IP = "192.168.0.228";
     const DEVICE_ID = "10023d09c2";
     
-    // Simplificamos al máximo el objeto para evitar el Error 500
-    const bodyApertura = {
-        deviceid: DEVICE_ID,
-        data: { switch: "on" }
+    // El Sonoff Mini es muy estricto con este formato
+    const dataOn = {
+        "deviceid": DEVICE_ID,
+        "data": { "switch": "on" }
     };
 
-    console.log("🚀 Intentando abrir...");
+    const dataOff = {
+        "deviceid": DEVICE_ID,
+        "data": { "switch": "off" }
+    };
+
+    console.log("🚀 Enviando pulso de apertura...");
 
     try {
-        // Usamos la API de Fetch pero sin esperar respuesta para evitar bloqueos de red
-        fetch(`http://${SONOFF_IP}:8081/zeroconf/switch`, {
+        // Usamos una técnica llamada 'keepalive' para asegurar que llegue
+        await fetch(`http://${SONOFF_IP}:8081/zeroconf/switch`, {
             method: 'POST',
-            body: JSON.stringify(bodyApertura)
+            mode: 'no-cors',
+            body: JSON.stringify(dataOn)
         });
 
-        console.log("✅ Señal ON enviada");
+        console.log("✅ ON enviado");
 
-        // Esperar 3 segundos y cerrar
-        setTimeout(() => {
-            const bodyCierre = {
-                deviceid: DEVICE_ID,
-                data: { switch: "off" }
-            };
-            fetch(`http://${SONOFF_IP}:8081/zeroconf/switch`, {
+        // El perno necesita unos segundos para que la persona pase
+        setTimeout(async () => {
+            await fetch(`http://${SONOFF_IP}:8081/zeroconf/switch`, {
                 method: 'POST',
-                body: JSON.stringify(bodyCierre)
+                mode: 'no-cors',
+                body: JSON.stringify(dataOff)
             });
-            console.log("🔒 Señal OFF enviada");
+            console.log("🔒 OFF enviado (Perno cerrado)");
         }, 3000);
 
     } catch (error) {
-        console.error("Error físico:", error);
+        console.error("Error de red local:", error);
     }
 }
         // 3. Funciones Admin
