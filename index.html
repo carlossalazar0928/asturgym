@@ -24,7 +24,7 @@
             <p class="text-white text-xl mb-4">IDENTIFÍQUESE (DNI / QR / Nº SOCIO)</p>
             <input type="text" id="main-input" autofocus 
                 class="w-full bg-white text-astur-blue text-5xl font-bold text-center py-6 rounded-2xl border-4 border-astur-yellow focus:outline-none shadow-inner"
-                placeholder="00.000.000" onkeyup="handleInput(event)">
+                placeholder="00000000" onkeyup="handleInput(event)">
             
             <div id="display-result" class="hidden mt-8 p-8 rounded-2xl access-card border-4 animate-bounce">
                 <div class="flex items-center justify-around">
@@ -45,7 +45,7 @@
         <div class="bg-white p-8 rounded-2xl w-full max-w-md">
             <h2 class="text-2xl font-bold text-astur-blue mb-4">Panel de Administración</h2>
             <div id="admin-auth">
-                <input type="password" id="admin-pass" class="w-full border-2 p-3 rounded mb-4" placeholder="Clave: gym1081">
+                <input type="password" id="admin-pass" class="w-full border-2 p-3 rounded mb-4" placeholder="Clave:">
                 <button onclick="loginAdmin()" class="w-full bg-astur-blue text-white py-3 rounded font-bold">ENTRAR</button>
             </div>
             <div id="admin-controls" class="hidden space-y-4">
