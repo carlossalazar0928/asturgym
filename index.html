@@ -87,25 +87,21 @@
 
     <script>
         // CONFIGURACIÓN
-        const SHEET_PROXY = "https://api.allorigins.win/get?url=" + encodeURIComponent(
-            "https://docs.google.com/spreadsheets/d/e/2PACX-1vTCyEdIV_bC82uoGFq1mIvJOXrvJI19KzwLVGjxyH8jYefbnHkNorxelpwTTqJ8KczrzoiiZ24dBWFj/pub?output=csv"
-        );
-        const SONOFF_IP = "192.168.0.228";
-        const SONOFF_ID = "10023d09c2";
-        
-        let sociosDB = [];
-        let fotosDB = {};
-        const ES_LOCAL = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        
-        // Sonidos embebidos
-        const sonidoOk = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAo');
-        const sonidoError = new Audio('data:audio/wav;base64,UklGRl8GAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAo');
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTCyEdIV_bC82uoGFq1mIvJOXrvJI19KzwLVGjxyH8jYefbnHkNorxelpwTTqJ8KczrzoiiZ24dBWFj/pub?output=csv";
+    const SONOFF_IP = "192.168.0.228";
+    const SONOFF_ID = "10023d09c2";
+    
+    let sociosDB = [];
+    let fotosDB = {};
+    const ES_LOCAL = window.location.protocol === 'file:' || window.location.hostname === 'localhost';
+    
+    const sonidoOk = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAo');
+    const sonidoError = new Audio('data:audio/wav;base64,UklGRl8GAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAo');
 
-        // INICIALIZACIÓN
-        window.addEventListener('load', function() {
-            document.getElementById('status-indicator').textContent = '🔄 Cargando socios...';
-            sincronizarSheets();
-        });
+    window.addEventListener('load', function() {
+        document.getElementById('status-indicator').textContent = '🔄 Cargando socios...';
+        sincronizarSheets();
+    });
 
         function handleInput(e) {
             if (e.key === "Enter") {
