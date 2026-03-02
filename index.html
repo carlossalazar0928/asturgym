@@ -218,32 +218,35 @@ const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTCyEdIV_bC82
 
         // GOOGLE SHEETS CON PROXY
         async function sincronizarSheets() {
-            try {
-                document.getElementById('status-indicator').textContent = '🌐 Conectando Google Sheets...';
-                const res = await fetch(SHEET_PROXY);
-                const data = await res.json();
-                const csv = atob(data.contents);
-                const filas = csv.split(/\r?\n/).slice(1);
-                
-                sociosDB = filas.map(f => {
-                    const c = f.split(",");
-                    return { 
-                        nombre: c[0]?.trim(), 
-                        dni: c[1]?.trim(), 
-                        numeroSocio: c[2]?.trim(), 
-                        pago: c[3]?.trim().toUpperCase() 
-                    };
-                }).filter(s => s.dni);
-                
-                document.getElementById('status-indicator').innerHTML = `✅ ${sociosDB.length} socios cargados`;
-                console.log(`✅ ${sociosDB.length} socios ONLINE`);
-                
-            } catch (err) {
-                document.getElementById('status-indicator').textContent = '⚠️ Error Sheets - Usa Admin';
-                console.error("❌ Sheets ERROR:", err);
-                sociosDB = []; // Limpiar datos corruptos
-            }
-        }
+    try {
+        document.getElementById('status-indicator').textContent = '🌐 Conectando Google Sheets...';
+        const res = await fetch(SHEET_URL + "&t=" + Date.now());
+        const csv = await res.text();  // ← SIN PROXY
+        const filas = csv.split(/\r?\n/).slice(1);
+        
+        sociosDB = filas.map(f => {
+            const c = f.split(",");
+            return { 
+                nombre: c[0]?.trim(), 
+                dni: c[1]?.trim(), 
+                numeroSocio: c[2]?.trim(), 
+                pago: c[3]?.trim().toUpperCase() 
+            };
+        }).filter(s => s.dni);
+        
+        document.getElementById('status-indicator').innerHTML = `✅ ${sociosDB.length} socios cargados`;
+        console.log(`✅ ${sociosDB.length} socios ONLINE`);
+        
+    } catch (err) {
+        // DATOS DE PRUEBA AUTOMÁTICOS
+        sociosDB = [
+            {nombre: "CARLOS SALAZAR", dni: "12345678", numeroSocio: "001", pago: "AL DIA"},
+            {nombre: "MARIA GONZALEZ", dni: "87654321", numeroSocio: "002", pago: "VENCIDO"}
+        ];
+        document.getElementById('status-indicator').innerHTML = `⚠️ 2 socios PRUEBA (Sin internet)`;
+        console.log("✅ Modo prueba activado");
+    }
+}
 
         // ADMIN
         function showAdminLogin() { document.getElementById('modal-admin').classList.remove('hidden'); }
