@@ -6,12 +6,29 @@
     <title>ASTUR GYM - Control de Acceso</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --astur-blue: #0066bc; --astur-yellow: #f9d71c; }
-        body { background-color: var(--astur-blue); font-family: 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; }
-        .astur-gradient { background: linear-gradient(135deg, var(--astur-blue) 0%, #004a87 100%); }
+        /* Colores oficiales Asturianos: Azul oscuro y Amarillo Cruz de la Victoria */
+        :root { 
+            --astur-blue: #002b5e; 
+            --astur-yellow: #fabb00; 
+        }
+        
+        /* Transición suave para el fondo completo */
+        body { 
+            background-color: var(--astur-blue); 
+            font-family: 'Segoe UI', sans-serif; 
+            overflow: hidden; 
+            height: 100vh; 
+            transition: background-color 0.4s ease-in-out;
+        }
+        
+        /* Clases para cambiar el fondo dinámicamente */
+        .bg-success { background-color: #16a34a !important; }
+        .bg-error { background-color: #dc2626 !important; }
+        
         .access-card { transition: all 0.3s ease-in-out; border-radius: 1.5rem; overflow: hidden; }
-        .status-success { border-color: #22c55e; background-color: rgba(255, 255, 255, 1); color: #16a34a; }
-        .status-error { border-color: #ef4444; background-color: rgba(255, 255, 255, 1); color: #dc2626; }
+        .status-success-card { border-color: #22c55e; color: #16a34a; }
+        .status-error-card { border-color: #ef4444; color: #dc2626; }
+        
         #access-log::-webkit-scrollbar { width: 6px; }
         #access-log::-webkit-scrollbar-thumb { background: var(--astur-yellow); border-radius: 10px; }
         
@@ -21,38 +38,50 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="astur-gradient flex items-center justify-center p-6">
+<body class="flex items-center justify-center p-6">
 
     <div class="flex w-full max-w-7xl gap-6 h-[85vh]">
-        <div id="view-client" class="flex-1 text-center flex flex-col justify-center">
+        
+        <div id="view-client" class="flex-1 text-center flex flex-col justify-center relative">
+            
             <img src="https://i.ibb.co/svknfxSq/541227282-18045312167644134-5085573338939708126-n.jpg" alt="Astur Gym Logo" class="w-40 mx-auto mb-4 drop-shadow-lg">
-            <h1 class="text-5xl font-black text-astur-yellow mb-6 tracking-tighter italic uppercase">ASTUR GYM</h1>
+            <h1 class="text-5xl font-black mb-6 tracking-tighter italic uppercase" style="color: var(--astur-yellow); text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">ASTUR GYM</h1>
             
             <div class="bg-white/10 backdrop-blur-md p-8 rounded-3xl shadow-2xl border border-white/20">
-                <p class="text-white text-xl mb-4 font-bold uppercase tracking-widest" id="status-indicator">Cargando socios...</p>
+                <p class="text-white/80 text-xl mb-4 font-bold uppercase tracking-widest">Ingrese DNI o N° Socio</p>
+                
                 <input type="text" id="main-input" autofocus 
-                    class="w-full bg-white text-astur-blue text-5xl font-bold text-center py-5 rounded-2xl border-4 border-astur-yellow focus:outline-none shadow-inner"
+                    class="w-full bg-white text-gray-900 text-6xl font-black text-center py-6 rounded-2xl border-4 border-transparent focus:border-yellow-400 focus:outline-none shadow-inner transition"
                     placeholder="00000000" onkeyup="handleInput(event)">
                 
                 <div id="display-result" class="hidden mt-6 p-6 bg-white border-8 access-card relative shadow-2xl shadow-black/50">
                     <img src="https://i.ibb.co/svknfxSq/541227282-18045312167644134-5085573338939708126-n.jpg" class="absolute top-4 right-4 w-12 opacity-20">
                     
                     <div class="flex items-center gap-8">
-                        <img id="res-foto" src="https://www.w3schools.com/howto/img_avatar.png" class="w-44 h-44 rounded-2xl object-cover border-4 border-astur-blue shadow-lg">
+                        <img id="res-foto" src="https://www.w3schools.com/howto/img_avatar.png" class="w-44 h-44 rounded-2xl object-cover shadow-lg">
                         <div class="text-left flex-1">
                             <h2 id="res-nombre" class="text-4xl font-black uppercase text-gray-800 leading-tight border-b-2 border-gray-100 pb-2 mb-2"></h2>
-                            <p id="res-dni" class="text-xl font-bold text-gray-400 mb-4 uppercase tracking-tighter"></p>
+                            <p id="res-dni" class="text-xl font-bold text-gray-500 mb-4 uppercase tracking-tighter"></p>
                             <div id="res-status-badge" class="inline-block px-6 py-2 rounded-xl text-2xl font-black text-white shadow-md uppercase"></div>
                         </div>
                     </div>
                 </div>
             </div>
-            <button onclick="showAdminLogin()" class="mt-6 text-white/40 hover:text-astur-yellow transition font-bold text-sm tracking-widest uppercase">Administración</button>
+
+            <div class="mt-8 flex justify-center items-center gap-8">
+                <button onclick="abrirPuertaReal()" class="bg-white/10 hover:bg-white/20 border border-white/30 text-white px-6 py-3 rounded-full font-bold uppercase tracking-widest transition flex items-center gap-2 shadow-lg backdrop-blur-sm">
+                    🔓 ABRIR PUERTA
+                </button>
+                
+                <button onclick="showAdminLogin()" class="text-white/40 hover:text-white transition font-bold text-sm tracking-widest uppercase">
+                    ⚙️ Administración
+                </button>
+            </div>
         </div>
 
-        <div class="w-80 bg-black/30 backdrop-blur-md rounded-3xl border border-white/10 flex flex-col overflow-hidden shadow-2xl">
+        <div class="w-80 bg-black/40 backdrop-blur-md rounded-3xl border border-white/10 flex flex-col overflow-hidden shadow-2xl">
             <div class="bg-white/10 p-4 text-center border-b border-white/10">
-                <h3 class="text-astur-yellow font-black uppercase tracking-wider text-sm">Historial Reciente</h3>
+                <h3 class="font-black uppercase tracking-wider text-sm" style="color: var(--astur-yellow);">Historial Reciente</h3>
                 <p class="text-white/50 text-[10px] mt-1" id="log-status">Esperando ingresos...</p>
             </div>
             <div id="access-log" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
@@ -62,17 +91,21 @@
     <div id="modal-admin" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
         <div class="bg-white p-8 rounded-3xl w-full max-w-md shadow-2xl">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-black text-astur-blue uppercase italic">Configuración</h2>
-                <span id="admin-total-accesos" class="bg-astur-yellow text-astur-blue px-3 py-1 rounded-full font-bold text-xs">Accesos Hoy: 0</span>
+                <h2 class="text-2xl font-black uppercase italic" style="color: var(--astur-blue);">Configuración</h2>
+                <span id="admin-total-accesos" class="bg-gray-800 text-white px-3 py-1 rounded-full font-bold text-xs">Accesos Hoy: 0</span>
             </div>
             
             <div id="admin-auth">
-                <input type="password" id="admin-pass" class="w-full border-4 border-gray-100 p-4 rounded-2xl mb-4 text-center text-2xl font-bold focus:border-astur-blue outline-none transition" placeholder="CLAVE">
-                <button onclick="loginAdmin()" class="w-full bg-astur-blue text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition">INGRESAR</button>
-                <button onclick="cerrarAdmin()" class="w-full mt-4 text-gray-400 text-xs font-bold uppercase">Cerrar</button>
+                <input type="password" id="admin-pass" class="w-full border-4 border-gray-100 p-4 rounded-2xl mb-4 text-center text-2xl font-bold outline-none transition" placeholder="CLAVE">
+                <button onclick="loginAdmin()" class="w-full text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition shadow-lg" style="background-color: var(--astur-blue);">INGRESAR</button>
+                <button onclick="cerrarAdmin()" class="w-full mt-4 text-gray-400 text-xs font-bold uppercase">Cancelar</button>
             </div>
 
             <div id="admin-controls" class="hidden space-y-4">
+                <div class="bg-blue-50 text-blue-800 p-3 rounded-xl text-center font-bold text-sm border border-blue-200" id="admin-db-status">
+                    Datos no cargados
+                </div>
+
                 <button onclick="sincronizarSheets()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-bold hover:bg-green-700 shadow-lg flex items-center justify-center gap-2">🔄 Sincronizar Excel</button>
                 <input type="file" id="foto-uploader" class="hidden" multiple onchange="procesarFotos(event)">
                 <button onclick="document.getElementById('foto-uploader').click()" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-bold hover:bg-blue-700 shadow-lg flex items-center justify-center gap-2">📸 Importar Fotos</button>
@@ -80,11 +113,11 @@
                 <div class="bg-gray-50 p-4 rounded-2xl border-2 border-dashed border-gray-200">
                     <div class="text-[10px] font-bold text-gray-400 uppercase mb-2">Estado del Hardware</div>
                     <div class="flex justify-between text-xs">
-                        <span>Puerta (Sonoff):</span>
-                        <span class="text-green-600 font-bold">CONECTADO</span>
+                        <span>Perno (Sonoff):</span>
+                        <span class="text-green-600 font-bold">192.168.0.228</span>
                     </div>
                 </div>
-                <button onclick="cerrarAdmin()" class="w-full bg-gray-100 p-4 rounded-2xl text-gray-600 font-bold uppercase hover:bg-gray-200 transition">Volver al Inicio</button>
+                <button onclick="cerrarAdmin()" class="w-full bg-gray-200 p-4 rounded-2xl text-gray-700 font-bold uppercase hover:bg-gray-300 transition">Volver al Inicio</button>
             </div>
         </div>
     </div>
@@ -97,9 +130,7 @@
         let sociosDB = [];
         let fotosDB = {};
         let contadorHoy = 0;
-        const ES_LOCAL = window.location.protocol === 'file:' || window.location.hostname === 'localhost';
         
-        // Sonidos limpios (Notificaciones de sistema)
         const sonidoOk = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
         const sonidoError = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
 
@@ -120,56 +151,69 @@
             const display = document.getElementById('display-result');
             const badge = document.getElementById('res-status-badge');
             
+            // RESETEAR FONDOS Y TARJETA
+            document.body.classList.remove('bg-success', 'bg-error');
+            display.classList.remove('hidden', 'status-success-card', 'status-error-card');
+            
             if (!socio) {
                 sonidoError.play();
+                document.body.classList.add('bg-error'); // Pone fondo rojo
                 document.getElementById('view-client').classList.add('shake-error');
                 setTimeout(() => document.getElementById('view-client').classList.remove('shake-error'), 500);
-                alert("❌ Socio no registrado");
+                setTimeout(() => document.body.classList.remove('bg-error'), 3000); // Vuelve al azul
                 return;
             }
 
-            // Actualizar Tarjeta
-            display.classList.remove('hidden', 'status-success', 'status-error');
+            // CARGAR DATOS EN TARJETA
             document.getElementById('res-nombre').innerText = socio.nombre;
-            document.getElementById('res-dni').innerText = `SOCIO ID: ${socio.numeroSocio} | DNI: ${socio.dni}`;
+            document.getElementById('res-dni').innerText = `SOCIO: ${socio.numeroSocio} | DNI: ${socio.dni}`;
             document.getElementById('res-foto').src = fotosDB[socio.dni] || 'https://www.w3schools.com/howto/img_avatar.png';
 
             const esValido = socio.pago.includes("AL DIA") || socio.pago.includes("ACTIVO");
 
             if (esValido) {
-                display.classList.add('status-success');
+                document.body.classList.add('bg-success'); // Todo el fondo verde
+                display.classList.add('status-success-card');
                 badge.innerText = "ACCESO PERMITIDO";
                 badge.style.backgroundColor = "#22c55e";
                 sonidoOk.play();
                 contadorHoy++;
                 document.getElementById('admin-total-accesos').innerText = `Accesos Hoy: ${contadorHoy}`;
                 
-                if (ES_LOCAL) abrirPuertaReal();
-                else simularApertura();
+                abrirPuertaReal(); // Abre el sonoff
             } else {
-                display.classList.add('status-error');
+                document.body.classList.add('bg-error'); // Todo el fondo rojo
+                display.classList.add('status-error-card');
                 badge.innerText = "PAGO VENCIDO";
                 badge.style.backgroundColor = "#ef4444";
                 sonidoError.play();
             }
 
             agregarAlLog(socio, esValido);
-            setTimeout(() => display.classList.add('hidden'), 5000);
+
+            // VOLVER A LA NORMALIDAD DESPUÉS DE 4 SEGUNDOS
+            setTimeout(() => {
+                document.body.classList.remove('bg-success', 'bg-error');
+                display.classList.add('hidden');
+                document.getElementById('main-input').focus();
+            }, 4000);
         }
 
+        // FUNCIÓN SONOFF (Apertura automática y Botón Manual)
         async function abrirPuertaReal() {
+            console.log("Activando relé...");
             const dataOn = { "deviceid": SONOFF_ID, "data": { "switch": "on" } };
             const dataOff = { "deviceid": SONOFF_ID, "data": { "switch": "off" } };
             try {
+                // Pulso ON
                 await fetch(`http://${SONOFF_IP}:8081/zeroconf/switch`, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dataOn) });
+                // Pulso OFF a los 3 segundos
                 setTimeout(() => {
                     fetch(`http://${SONOFF_IP}:8081/zeroconf/switch`, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dataOff) });
                 }, 3000);
-            } catch (e) { console.error("Error Sonoff:", e); }
-        }
-
-        function simularApertura() {
-            console.log("🌐 WEB SIMULACIÓN: Puerta abierta");
+            } catch (e) { 
+                console.error("Error conectando con el Sonoff:", e); 
+            }
         }
 
         function agregarAlLog(socio, exito) {
@@ -193,7 +237,9 @@
 
         async function sincronizarSheets() {
             try {
-                document.getElementById('status-indicator').textContent = '🔄 Conectando Excel...';
+                document.getElementById('admin-db-status').textContent = '🔄 Conectando...';
+                document.getElementById('admin-db-status').className = 'bg-yellow-50 text-yellow-800 p-3 rounded-xl text-center font-bold text-sm border border-yellow-200';
+                
                 const res = await fetch(SHEET_URL + "&t=" + Date.now());
                 const csv = await res.text();
                 const filas = csv.split(/\r?\n/).slice(1);
@@ -201,14 +247,18 @@
                     const c = f.split(",");
                     return { nombre: c[0]?.trim(), dni: c[1]?.trim(), numeroSocio: c[2]?.trim(), pago: c[3]?.trim().toUpperCase() };
                 }).filter(s => s.dni);
-                document.getElementById('status-indicator').innerHTML = `✅ ${sociosDB.length} SOCIOS ACTIVOS`;
+                
+                document.getElementById('admin-db-status').textContent = `✅ ${sociosDB.length} SOCIOS EN BASE DE DATOS`;
+                document.getElementById('admin-db-status').className = 'bg-green-50 text-green-800 p-3 rounded-xl text-center font-bold text-sm border border-green-200';
             } catch (err) {
-                document.getElementById('status-indicator').innerHTML = `❌ Error de Conexión`;
+                document.getElementById('admin-db-status').textContent = `❌ Error de Conexión. Revisa internet.`;
+                document.getElementById('admin-db-status').className = 'bg-red-50 text-red-800 p-3 rounded-xl text-center font-bold text-sm border border-red-200';
             }
         }
 
         function showAdminLogin() { document.getElementById('modal-admin').classList.remove('hidden'); }
-        function cerrarAdmin() { document.getElementById('modal-admin').classList.add('hidden'); }
+        function cerrarAdmin() { document.getElementById('modal-admin').classList.add('hidden'); document.getElementById('main-input').focus(); }
+        
         function loginAdmin() {
             if(document.getElementById('admin-pass').value === "gym1081") {
                 document.getElementById('admin-auth').classList.add('hidden');
