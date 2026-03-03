@@ -201,30 +201,32 @@
 
         // FUNCIÓN SONOFF (Apertura automática y Botón Manual)
         // FUNCIÓN SONOFF CORREGIDA
-        async function abrirPuertaReal() {
-            console.log("Activando relé...");
+       async function abrirPuertaReal() {
+            console.log("🚀 Enviando comando de apertura...");
             const dataOn = { "deviceid": SONOFF_ID, "data": { "switch": "on" } };
             const dataOff = { "deviceid": SONOFF_ID, "data": { "switch": "off" } };
             
-            try {
-                // Pulso ON
-                await fetch(`http://${SONOFF_IP}:8081/zeroconf/switch`, { 
+            // Usamos un enfoque compatible con navegadores estrictos
+            const enviarComando = async (payload) => {
+                return fetch(`http://${SONOFF_IP}:8081/zeroconf/switch`, { 
                     method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dataOn) 
+                    mode: 'no-cors', // Evita el error de CORS
+                    body: JSON.stringify(payload) 
                 });
+            };
+
+            try {
+                await enviarComando(dataOn);
+                console.log("✅ Pulso ON enviado");
                 
-                // Pulso OFF a los 3 segundos
                 setTimeout(async () => {
-                    await fetch(`http://${SONOFF_IP}:8081/zeroconf/switch`, { 
-                        method: 'POST', 
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(dataOff) 
-                    });
-                }, 3000);
+                    await enviarComando(dataOff);
+                    console.log("✅ Pulso OFF enviado");
+                }, 2000); // 2 segundos abierto
             } catch (e) { 
-                console.error("Error conectando con el Sonoff:", e); 
+                console.error("❌ Error de red:", e); 
             }
+        }
         }
 
         function agregarAlLog(socio, exito) {
