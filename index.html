@@ -200,16 +200,27 @@
         }
 
         // FUNCIÓN SONOFF (Apertura automática y Botón Manual)
+        // FUNCIÓN SONOFF CORREGIDA
         async function abrirPuertaReal() {
             console.log("Activando relé...");
             const dataOn = { "deviceid": SONOFF_ID, "data": { "switch": "on" } };
             const dataOff = { "deviceid": SONOFF_ID, "data": { "switch": "off" } };
+            
             try {
                 // Pulso ON
-                await fetch(`http://${SONOFF_IP}:8081/zeroconf/switch`, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dataOn) });
+                await fetch(`http://${SONOFF_IP}:8081/zeroconf/switch`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dataOn) 
+                });
+                
                 // Pulso OFF a los 3 segundos
-                setTimeout(() => {
-                    fetch(`http://${SONOFF_IP}:8081/zeroconf/switch`, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dataOff) });
+                setTimeout(async () => {
+                    await fetch(`http://${SONOFF_IP}:8081/zeroconf/switch`, { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(dataOff) 
+                    });
                 }, 3000);
             } catch (e) { 
                 console.error("Error conectando con el Sonoff:", e); 
