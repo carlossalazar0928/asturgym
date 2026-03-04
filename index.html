@@ -201,33 +201,32 @@
 
         // FUNCIÓN SONOFF (Apertura automática y Botón Manual)
         // FUNCIÓN SONOFF CORREGIDA
-       async function abrirPuertaReal() {
-            console.log("🚀 Enviando comando de apertura...");
-            const dataOn = { "deviceid": SONOFF_ID, "data": { "switch": "on" } };
-            const dataOff = { "deviceid": SONOFF_ID, "data": { "switch": "off" } };
-            
-            // Usamos un enfoque compatible con navegadores estrictos
-            const enviarComando = async (payload) => {
-                return fetch(`http://${SONOFF_IP}:8081/zeroconf/switch`, { 
-                    method: 'POST', 
-                    mode: 'no-cors', // Evita el error de CORS
-                    body: JSON.stringify(payload) 
-                });
-            };
+       // --- ESTE ES EL BLOQUE CORREGIDO ---
+async function abrirPuertaReal() {
+    console.log("🚀 Enviando comando de apertura...");
+    const dataOn = { "deviceid": SONOFF_ID, "data": { "switch": "on" } };
+    const dataOff = { "deviceid": SONOFF_ID, "data": { "switch": "off" } };
+    
+    const enviarComando = async (payload) => {
+        return fetch(`http://${SONOFF_IP}:8081/zeroconf/switch`, { 
+            method: 'POST', 
+            mode: 'no-cors', 
+            body: JSON.stringify(payload) 
+        });
+    };
 
-            try {
-                await enviarComando(dataOn);
-                console.log("✅ Pulso ON enviado");
-                
-                setTimeout(async () => {
-                    await enviarComando(dataOff);
-                    console.log("✅ Pulso OFF enviado");
-                }, 2000); // 2 segundos abierto
-            } catch (e) { 
-                console.error("❌ Error de red:", e); 
-            }
-        }
-        }
+    try {
+        await enviarComando(dataOn);
+        console.log("✅ Pulso ON enviado");
+        
+        setTimeout(async () => {
+            await enviarComando(dataOff);
+            console.log("✅ Pulso OFF enviado");
+        }, 2000); 
+    } catch (e) { 
+        console.error("❌ Error de red:", e); 
+    }
+} // <--- SOLO DEBE HABER UNA LLAVE AQUÍ
 
         function agregarAlLog(socio, exito) {
             const log = document.getElementById('access-log');
