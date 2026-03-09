@@ -202,31 +202,17 @@
         // FUNCIÓN SONOFF (Apertura automática y Botón Manual)
         // FUNCIÓN SONOFF CORREGIDA
        // --- ESTE ES EL BLOQUE CORREGIDO ---
-async function abrirPuertaReal() {
-    console.log("🚀 Enviando comando de apertura...");
-    const dataOn = { "deviceid": SONOFF_ID, "data": { "switch": "on" } };
-    const dataOff = { "deviceid": SONOFF_ID, "data": { "switch": "off" } };
-    
-    const enviarComando = async (payload) => {
-        return fetch(`http://${SONOFF_IP}:8081/zeroconf/switch`, { 
-            method: 'POST', 
-            mode: 'no-cors', 
-            body: JSON.stringify(payload) 
-        });
-    };
+aasync function abrirPuertaReal() {
+    // Usamos la IP de tu Home Assistant que vimos antes
+    const URL_HA = "http://192.168.0.247:8123/api/webhook/abrir_puerta_astur";
 
     try {
-        await enviarComando(dataOn);
-        console.log("✅ Pulso ON enviado");
-        
-        setTimeout(async () => {
-            await enviarComando(dataOff);
-            console.log("✅ Pulso OFF enviado");
-        }, 2000); 
-    } catch (e) { 
-        console.error("❌ Error de red:", e); 
+        await fetch(URL_HA, { method: 'POST' });
+        console.log("🔓 Orden de apertura enviada correctamente");
+    } catch (error) {
+        console.error("Error al conectar con Home Assistant:", error);
     }
-} // <--- SOLO DEBE HABER UNA LLAVE AQUÍ
+}
 
         function agregarAlLog(socio, exito) {
             const log = document.getElementById('access-log');
