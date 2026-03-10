@@ -76,7 +76,7 @@
     </div>
 
     <div id="modal-admin" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-        <div class="bg-white p-8 rounded-3xl w-full max-w-md shadow-2xl">
+        <div class="bg-white p-8 rounded-3xl w-full max-w-md shadow-2xl overflow-y-auto max-h-[90vh]">
             <h2 class="text-2xl font-black uppercase italic mb-6" style="color: var(--astur-blue);">Administración</h2>
             <div id="admin-auth">
                 <input type="password" id="admin-pass" class="w-full border-4 border-gray-100 p-4 rounded-2xl mb-4 text-center text-2xl font-bold outline-none" placeholder="CLAVE">
@@ -84,23 +84,21 @@
                 <button onclick="cerrarAdmin()" class="w-full mt-4 text-gray-400 text-xs font-bold uppercase">Cancelar</button>
             </div>
             <div id="admin-controls" class="hidden space-y-4">
-                <button id="btn-sincronizar" class="w-full bg-green-600 text-white p-4 rounded-2xl font-bold hover:bg-green-700 shadow-lg flex items-center justify-center gap-2">
-                    🔄 Sincronizar Excel
-                </button>
+                <button id="btn-sincronizar" class="w-full bg-green-600 text-white p-4 rounded-2xl font-bold hover:bg-green-700 shadow-lg flex items-center justify-center gap-2">🔄 Sincronizar Excel</button>
                 <input type="file" id="foto-uploader" class="hidden" multiple onchange="procesarFotos(event)">
                 <button onclick="document.getElementById('foto-uploader').click()" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-bold hover:bg-blue-700 shadow-lg">📸 Importar Fotos</button>
+                
                 <div class="mt-6 pt-6 border-t border-gray-200">
-    <div class="text-[10px] font-bold text-gray-400 uppercase mb-2">Generar QR para Socio</div>
-    <div class="space-y-2">
-        <input type="text" id="qr-dni" class="w-full border-2 border-gray-100 p-2 rounded-xl text-center font-bold outline-none focus:border-blue-400" placeholder="DNI del Socio">
-        <input type="text" id="qr-tel" class="w-full border-2 border-gray-100 p-2 rounded-xl text-center font-bold outline-none focus:border-blue-400" placeholder="WhatsApp (ej: 54911...)">
-        <button onclick="enviarQRWhatsapp()" class="w-full bg-black text-white p-3 rounded-xl font-bold hover:bg-gray-800 transition flex items-center justify-center gap-2">
-            📲 Generar y Enviar QR
-        </button>
-    </div>
-</div>
-                <div class="bg-gray-100 p-3 rounded-xl text-xs">
-                    <p><b>Hardware Ethernet:</b> <span class="text-blue-600">192.168.0.50</span></p>
+                    <div class="text-[10px] font-bold text-gray-400 uppercase mb-2 text-center">Generar QR Socio</div>
+                    <div class="space-y-2">
+                        <input type="text" id="qr-dni" class="w-full border-2 border-gray-100 p-2 rounded-xl text-center font-bold outline-none" placeholder="DNI Socio">
+                        <input type="text" id="qr-tel" class="w-full border-2 border-gray-100 p-2 rounded-xl text-center font-bold outline-none" placeholder="WhatsApp (549...)">
+                        <button onclick="enviarQRWhatsapp()" class="w-full bg-black text-white p-3 rounded-xl font-bold hover:bg-gray-800 transition">📲 Enviar QR</button>
+                    </div>
+                </div>
+
+                <div class="bg-gray-100 p-3 rounded-xl text-xs mt-4">
+                    <p><b>Placa Roja:</b> <span class="text-blue-600">192.168.0.50</span></p>
                 </div>
                 <button onclick="cerrarAdmin()" class="w-full bg-gray-200 p-4 rounded-2xl text-gray-700 font-bold uppercase">Cerrar</button>
             </div>
@@ -109,7 +107,7 @@
 
     <script>
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTCyEdIV_bC82uoGFq1mIvJOXrvJI19KzwLVGjxyH8jYefbnHkNorxelpwTTqJ8KczrzoiiZ24dBWFj/pub?output=csv";
-        const PLACA_IP = "192.168.0.50"; 
+        const PLACA_IP = "192.168.0.50"; // IP Placa Roja
         
         let sociosDB = [];
         let fotosDB = {};
@@ -118,7 +116,6 @@
 
         window.onload = () => { sincronizarSheets(); };
 
-        // Vinculación robusta del botón de sincronización
         document.addEventListener('DOMContentLoaded', () => {
             const botonSincro = document.getElementById('btn-sincronizar');
             if (botonSincro) {
@@ -133,7 +130,7 @@
             }
         }
 
-        async function sincronizarSheets(event) {
+        async function sincronizarSheets() {
             const btn = document.getElementById('btn-sincronizar');
             const originalText = btn.innerHTML;
             btn.innerHTML = "⏳ Sincronizando...";
@@ -151,22 +148,16 @@
                         dni: c[1]?.trim(), 
                         numeroSocio: c[2]?.trim(), 
                         estado: c[3]?.trim().toUpperCase(),
-                        importe: c[4]?.trim() 
+                        importe: c[4]?.trim() // Columna E: Importe
                     };
                 }).filter(s => s.dni);
                 
                 btn.innerHTML = "✅ ¡Listo!";
-                btn.className = btn.className.replace('bg-green-600', 'bg-blue-600');
-                
                 setTimeout(() => {
                     btn.innerHTML = originalText;
-                    btn.className = btn.className.replace('bg-blue-600', 'bg-green-600');
                     btn.disabled = false;
                 }, 2000);
-            } catch (err) { 
-                btn.innerHTML = "❌ Error";
-                btn.disabled = false;
-            }
+            } catch (err) { btn.disabled = false; }
         }
 
         async function validarSocio(id) {
@@ -179,7 +170,6 @@
                 return; 
             }
 
-            // Suma acumulada para la validación interna
             const totalPagado = registrosSocio.reduce((acc, curr) => acc + (parseFloat(curr.importe) || 0), 0);
             const ahora = new Date();
             const horaActual = ahora.getHours() + (ahora.getMinutes() / 60);
@@ -196,7 +186,7 @@
                 statusText = "ACCESO REDUCIDO";
             } else {
                 acceso = false;
-                statusText = (totalPagado > 0) ? "HORARIO VENCIDO" : "ACCESO DENEGADO";
+                statusText = (totalPagado > 0) ? "HORARIO VENCIDO" : "PAGO INSUFICIENTE";
             }
 
             if (acceso) {
@@ -209,7 +199,6 @@
         }
 
         async function abrirPuertaReal() {
-            // Envío directo a la placa Ethernet Roja 
             const URL_COMANDO = `http://${PLACA_IP}/rele1?pulse=2`; 
             try {
                 await fetch(URL_COMANDO, { method: 'GET', mode: 'no-cors' });
@@ -241,11 +230,32 @@
 
         function agregarAlLog(socio, exito, status) {
             const log = document.getElementById('access-log');
+            const ahora = new Date();
+            // Formateamos la hora: HH:MM:SS
+            const horaStr = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            
             const entry = document.createElement('div');
             entry.className = `p-3 rounded-2xl border-l-4 bg-white/5 ${exito ? 'border-green-500' : 'border-red-500'} animate-fade-in text-white`;
-            entry.innerHTML = `<div class="text-xs font-bold uppercase">${socio.nombre}</div><div class="text-[9px] ${exito ? 'text-green-400' : 'text-red-400'} font-bold">${status}</div>`;
+            entry.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div class="text-xs font-bold uppercase">${socio.nombre}</div>
+                    <div class="text-[9px] text-white/50 font-mono">${horaStr}</div>
+                </div>
+                <div class="text-[9px] ${exito ? 'text-green-400' : 'text-red-400'} font-bold">${status}</div>
+            `;
             log.prepend(entry);
-            if (log.children.length > 10) log.removeChild(log.lastChild);
+            if (log.children.length > 15) log.removeChild(log.lastChild);
+        }
+
+        function enviarQRWhatsapp() {
+            const dni = document.getElementById('qr-dni').value.trim();
+            let tel = document.getElementById('qr-tel').value.trim();
+            if (!dni || !tel) { alert("DNI y Teléfono obligatorios"); return; }
+            tel = tel.replace(/\D/g, '');
+            // API QRSERVER estable
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${dni}`;
+            const mensaje = encodeURIComponent(`¡Hola! 👋 Código QR de acceso ASTUR GYM. \n\nPresentalo al ingresar: \n${qrUrl}`);
+            window.open(`https://wa.me/${tel}?text=${mensaje}`, '_blank');
         }
 
         function showAdminLogin() { document.getElementById('modal-admin').classList.remove('hidden'); }
@@ -261,28 +271,6 @@
             });
             alert("Fotos vinculadas");
         }
-        function enviarQRWhatsapp() {
-    const dni = document.getElementById('qr-dni').value.trim();
-    let tel = document.getElementById('qr-tel').value.trim();
-    
-    if (!dni || !tel) {
-        alert("Por favor, ingresá DNI y Teléfono");
-        return;
-    }
-
-    // Limpiamos el teléfono
-    tel = tel.replace(/\D/g, '');
-
-    // CAMBIO CLAVE: Usamos la API de goqr.me en lugar de la de Google
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${dni}`;
-    
-    // Armamos el mensaje para WhatsApp
-    const mensaje = encodeURIComponent(`¡Hola! 👋 Este es tu código QR de acceso para *ASTUR GYM*. \n\nPresentalo en el lector al ingresar: \n${qrUrl}`);
-
-    // Abrimos WhatsApp
-    const whatsappUrl = `https://wa.me/${tel}?text=${mensaje}`;
-    window.open(whatsappUrl, '_blank');
-}
     </script>
 </body>
 </html>
