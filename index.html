@@ -270,12 +270,11 @@
         return;
     }
 
-    // Limpiamos el teléfono (quitamos +, espacios o guiones)
+    // Limpiamos el teléfono
     tel = tel.replace(/\D/g, '');
 
-    // Generamos la URL del código QR usando la API de Google (300x300 px)
-    // El contenido del QR será simplemente el DNI para que tu lector lo procese
-    const qrUrl = `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${dni}`;
+    // CAMBIO CLAVE: Usamos la API de goqr.me en lugar de la de Google
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${dni}`;
     
     // Armamos el mensaje para WhatsApp
     const mensaje = encodeURIComponent(`¡Hola! 👋 Este es tu código QR de acceso para *ASTUR GYM*. \n\nPresentalo en el lector al ingresar: \n${qrUrl}`);
