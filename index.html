@@ -84,7 +84,9 @@
                 <button onclick="cerrarAdmin()" class="w-full mt-4 text-gray-400 text-xs font-bold uppercase">Cancelar</button>
             </div>
             <div id="admin-controls" class="hidden space-y-4">
-                <button onclick="sincronizarSheets()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-bold hover:bg-green-700 shadow-lg flex items-center justify-center gap-2">🔄 Sincronizar Excel</button>
+                <button id="btn-sincronizar" class="w-full bg-green-600 text-white p-4 rounded-2xl font-bold hover:bg-green-700 shadow-lg flex items-center justify-center gap-2">
+                    🔄 Sincronizar Excel
+                </button>
                 <input type="file" id="foto-uploader" class="hidden" multiple onchange="procesarFotos(event)">
                 <button onclick="document.getElementById('foto-uploader').click()" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-bold hover:bg-blue-700 shadow-lg">📸 Importar Fotos</button>
                 <div class="bg-gray-100 p-3 rounded-xl text-xs">
@@ -106,6 +108,14 @@
 
         window.onload = () => { sincronizarSheets(); };
 
+        // Vinculación robusta del botón de sincronización
+        document.addEventListener('DOMContentLoaded', () => {
+            const botonSincro = document.getElementById('btn-sincronizar');
+            if (botonSincro) {
+                botonSincro.addEventListener('click', (e) => sincronizarSheets(e));
+            }
+        });
+
         function handleInput(e) {
             if (e.key === "Enter") {
                 const val = e.target.value.trim();
@@ -113,11 +123,17 @@
             }
         }
 
-        async function sincronizarSheets() {
+        async function sincronizarSheets(event) {
+            const btn = document.getElementById('btn-sincronizar');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "⏳ Sincronizando...";
+            btn.disabled = true;
+
             try {
                 const res = await fetch(SHEET_URL + "&t=" + Date.now());
                 const csv = await res.text();
                 const filas = csv.split(/\r?\n/).slice(1);
+                
                 sociosDB = filas.map(f => {
                     const c = f.split(",");
                     return { 
@@ -128,12 +144,24 @@
                         importe: c[4]?.trim() 
                     };
                 }).filter(s => s.dni);
-                console.log("DB Sincronizada");
-            } catch (err) { console.error("Error sincronizando"); }
+                
+                btn.innerHTML = "✅ ¡Listo!";
+                btn.className = btn.className.replace('bg-green-600', 'bg-blue-600');
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.className = btn.className.replace('bg-blue-600', 'bg-green-600');
+                    btn.disabled = false;
+                }, 2000);
+            } catch (err) { 
+                btn.innerHTML = "❌ Error";
+                btn.disabled = false;
+            }
         }
 
         async function validarSocio(id) {
             const registrosSocio = sociosDB.filter(s => s.dni == id || s.numeroSocio == id);
+            
             if (registrosSocio.length === 0) { 
                 document.body.className = "flex items-center justify-center p-6 bg-error";
                 sonidoError.play();
@@ -141,6 +169,7 @@
                 return; 
             }
 
+            // Suma acumulada para la validación interna
             const totalPagado = registrosSocio.reduce((acc, curr) => acc + (parseFloat(curr.importe) || 0), 0);
             const ahora = new Date();
             const horaActual = ahora.getHours() + (ahora.getMinutes() / 60);
@@ -170,6 +199,7 @@
         }
 
         async function abrirPuertaReal() {
+            // Envío directo a la placa Ethernet Roja 
             const URL_COMANDO = `http://${PLACA_IP}/rele1?pulse=2`; 
             try {
                 await fetch(URL_COMANDO, { method: 'GET', mode: 'no-cors' });
@@ -208,6 +238,10 @@
             if (log.children.length > 10) log.removeChild(log.lastChild);
         }
 
+        function showAdminLogin() { document.getElementById('modal-admin').classList.remove('hidden'); }
+        function cerrarAdmin() { document.getElementById('modal-admin').classList.add('hidden'); }
+        function loginAdmin() { if(document.getElementById('admin-pass').value === "gym1081") { document.getElementById('admin-auth').classList.add('hidden'); document.getElementById('admin-controls').classList.remove('hidden'); } }
+        
         function procesarFotos(e) {
             Array.from(e.target.files).forEach(file => {
                 const reader = new FileReader();
@@ -217,10 +251,6 @@
             });
             alert("Fotos vinculadas");
         }
-
-        function showAdminLogin() { document.getElementById('modal-admin').classList.remove('hidden'); }
-        function cerrarAdmin() { document.getElementById('modal-admin').classList.add('hidden'); }
-        function loginAdmin() { if(document.getElementById('admin-pass').value === "gym1081") { document.getElementById('admin-auth').classList.add('hidden'); document.getElementById('admin-controls').classList.remove('hidden'); } }
     </script>
 </body>
 </html>
