@@ -89,6 +89,16 @@
                 </button>
                 <input type="file" id="foto-uploader" class="hidden" multiple onchange="procesarFotos(event)">
                 <button onclick="document.getElementById('foto-uploader').click()" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-bold hover:bg-blue-700 shadow-lg">📸 Importar Fotos</button>
+                <div class="mt-6 pt-6 border-t border-gray-200">
+    <div class="text-[10px] font-bold text-gray-400 uppercase mb-2">Generar QR para Socio</div>
+    <div class="space-y-2">
+        <input type="text" id="qr-dni" class="w-full border-2 border-gray-100 p-2 rounded-xl text-center font-bold outline-none focus:border-blue-400" placeholder="DNI del Socio">
+        <input type="text" id="qr-tel" class="w-full border-2 border-gray-100 p-2 rounded-xl text-center font-bold outline-none focus:border-blue-400" placeholder="WhatsApp (ej: 54911...)">
+        <button onclick="enviarQRWhatsapp()" class="w-full bg-black text-white p-3 rounded-xl font-bold hover:bg-gray-800 transition flex items-center justify-center gap-2">
+            📲 Generar y Enviar QR
+        </button>
+    </div>
+</div>
                 <div class="bg-gray-100 p-3 rounded-xl text-xs">
                     <p><b>Hardware Ethernet:</b> <span class="text-blue-600">192.168.0.50</span></p>
                 </div>
@@ -251,6 +261,29 @@
             });
             alert("Fotos vinculadas");
         }
+        function enviarQRWhatsapp() {
+    const dni = document.getElementById('qr-dni').value.trim();
+    let tel = document.getElementById('qr-tel').value.trim();
+    
+    if (!dni || !tel) {
+        alert("Por favor, ingresá DNI y Teléfono");
+        return;
+    }
+
+    // Limpiamos el teléfono (quitamos +, espacios o guiones)
+    tel = tel.replace(/\D/g, '');
+
+    // Generamos la URL del código QR usando la API de Google (300x300 px)
+    // El contenido del QR será simplemente el DNI para que tu lector lo procese
+    const qrUrl = `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${dni}`;
+    
+    // Armamos el mensaje para WhatsApp
+    const mensaje = encodeURIComponent(`¡Hola! 👋 Este es tu código QR de acceso para *ASTUR GYM*. \n\nPresentalo en el lector al ingresar: \n${qrUrl}`);
+
+    // Abrimos WhatsApp
+    const whatsappUrl = `https://wa.me/${tel}?text=${mensaje}`;
+    window.open(whatsappUrl, '_blank');
+}
     </script>
 </body>
 </html>
