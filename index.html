@@ -97,7 +97,7 @@
 
     <script>
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTCyEdIV_bC82uoGFq1mIvJOXrvJI19KzwLVGjxyH8jYefbnHkNorxelpwTTqJ8KczrzoiiZ24dBWFj/pub?output=csv";
-        const PLACA_IP = "192.168.0.50"; // IP de la nueva placa roja
+        const PLACA_IP = "192.168.0.50"; 
         
         let sociosDB = [];
         let fotosDB = {};
@@ -125,7 +125,7 @@
                         dni: c[1]?.trim(), 
                         numeroSocio: c[2]?.trim(), 
                         estado: c[3]?.trim().toUpperCase(),
-                        importe: c[4]?.trim() // Columna E: Importe
+                        importe: c[4]?.trim() 
                     };
                 }).filter(s => s.dni);
                 console.log("DB Sincronizada");
@@ -134,11 +134,14 @@
 
         async function validarSocio(id) {
             const registrosSocio = sociosDB.filter(s => s.dni == id || s.numeroSocio == id);
-            if (registrosSocio.length === 0) { manejarDenegacion(null, "No encontrado"); return; }
+            if (registrosSocio.length === 0) { 
+                document.body.className = "flex items-center justify-center p-6 bg-error";
+                sonidoError.play();
+                setTimeout(() => document.body.className = "flex items-center justify-center p-6", 2000);
+                return; 
+            }
 
-            // Suma acumulada de importes
             const totalPagado = registrosSocio.reduce((acc, curr) => acc + (parseFloat(curr.importe) || 0), 0);
-            
             const ahora = new Date();
             const horaActual = ahora.getHours() + (ahora.getMinutes() / 60);
             const limiteHora = 17.5; // 17:30hs
@@ -158,31 +161,28 @@
             }
 
             if (acceso) {
-                mostrarUI(registrosSocio[0], statusText, true, totalPagado);
+                mostrarUI(registrosSocio[0], statusText, true);
                 abrirPuertaReal();
             } else {
-                mostrarUI(registrosSocio[0], statusText, false, totalPagado);
+                mostrarUI(registrosSocio[0], statusText, false);
                 sonidoError.play();
             }
         }
 
         async function abrirPuertaReal() {
-            // Comando para la placa Ethernet
-            // Nota: El comando '/rele1?pulse=2' es genérico; ajustalo según el manual de tu placa
             const URL_COMANDO = `http://${PLACA_IP}/rele1?pulse=2`; 
             try {
                 await fetch(URL_COMANDO, { method: 'GET', mode: 'no-cors' });
                 sonidoOk.play();
-                console.log("Puerta abierta vía Ethernet");
             } catch (e) { console.error("Error placa Ethernet"); }
         }
 
-        function mostrarUI(socio, status, exito, total) {
+        function mostrarUI(socio, status, exito) {
             const display = document.getElementById('display-result');
             const badge = document.getElementById('res-status-badge');
             
             document.getElementById('res-nombre').textContent = socio.nombre;
-            document.getElementById('res-dni').textContent = `DNI: ${socio.dni} | ACUMULADO: $${total}`;
+            document.getElementById('res-dni').textContent = `DNI: ${socio.dni}`;
             document.getElementById('res-foto').src = fotosDB[socio.dni] || "https://www.w3schools.com/howto/img_avatar.png";
             
             badge.textContent = status;
@@ -191,7 +191,7 @@
             display.classList.remove('hidden');
             document.body.className = `flex items-center justify-center p-6 ${exito ? 'bg-success' : 'bg-error'}`;
             
-            agregarAlLog(socio, exito);
+            agregarAlLog(socio, exito, status);
             setTimeout(() => {
                 display.classList.add('hidden');
                 document.body.className = "flex items-center justify-center p-6";
@@ -199,11 +199,11 @@
             }, 4000);
         }
 
-        function agregarAlLog(socio, exito) {
+        function agregarAlLog(socio, exito, status) {
             const log = document.getElementById('access-log');
             const entry = document.createElement('div');
             entry.className = `p-3 rounded-2xl border-l-4 bg-white/5 ${exito ? 'border-green-500' : 'border-red-500'} animate-fade-in text-white`;
-            entry.innerHTML = `<div class="text-xs font-bold uppercase">${socio.nombre}</div><div class="text-[9px] ${exito ? 'text-green-400' : 'text-red-400'}">${exito ? 'VALIDADO' : 'DENEGADO'}</div>`;
+            entry.innerHTML = `<div class="text-xs font-bold uppercase">${socio.nombre}</div><div class="text-[9px] ${exito ? 'text-green-400' : 'text-red-400'} font-bold">${status}</div>`;
             log.prepend(entry);
             if (log.children.length > 10) log.removeChild(log.lastChild);
         }
